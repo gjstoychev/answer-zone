@@ -1,5 +1,4 @@
 import React from 'react';
-import { useRandomQuestion } from '../hooks/useRandomQuestion';
 
 interface AnswerStatusProps {
   isSubmitted: boolean;
@@ -7,6 +6,7 @@ interface AnswerStatusProps {
   answeredLetters: string;
   correctAnswersCount: number;
   incorrectAnswersCount: number;
+  totalQuestions: number;
 }
 
 const AnswerStatus: React.FC<AnswerStatusProps> = ({
@@ -15,11 +15,8 @@ const AnswerStatus: React.FC<AnswerStatusProps> = ({
   answeredLetters,
   correctAnswersCount,
   incorrectAnswersCount,
+  totalQuestions,
 }) => {
-  // hooks
-  const { totalQuestions } = useRandomQuestion();
-
-  // variables
   const totalAnswersGiven = correctAnswersCount + incorrectAnswersCount;
   const successRate = Math.round((correctAnswersCount / totalAnswersGiven) * 100) || 0;
   const isCorrect = answeredLetters === correctLetters;
@@ -28,7 +25,6 @@ const AnswerStatus: React.FC<AnswerStatusProps> = ({
     ? isCorrect ? 'answer-correct' : 'answer-incorrect'
     : '';
 
-  // render
   return (
     <div className={`answer-status ${answerStatusColor}`}>
       {isSubmitted ? (

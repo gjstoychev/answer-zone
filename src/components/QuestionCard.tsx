@@ -20,14 +20,14 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
 }) => {
   const { question: questionText, answers, correct } = question;
 
-  const isMultiAnswer = Array.isArray(correct);
-
   const getAnswerClass = (answer: string) => {
     const isAnswerSelected = selectedAnswer.includes(answer);
   
     if (!isSubmitted) return isAnswerSelected ? 'selected' : '';
   
-    const isCorrectAnswer = isMultiAnswer ? correct.includes(answer) : answer === correct;
+    const isCorrectAnswer = Array.isArray(correct)
+      ? correct.includes(answer)
+      : answer === correct;
   
     if (isCorrectAnswer) return 'correct';
     if (isAnswerSelected) return 'wrong';

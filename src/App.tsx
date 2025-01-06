@@ -1,32 +1,68 @@
 import React, { useState } from 'react';
-import { useRandomQuestion } from './hooks/useRandomQuestion';
-import QuestionCard from './components/QuestionCard';
+import { questionsMock } from './data/questionsMock';
 import AnswerStatus from './components/AnswerStatus';
+import QuestionCard from './components/QuestionCard';
 import './App.css';
 
 const App: React.FC = () => {
-  // hooks
-  const { question, nextQuestion } = useRandomQuestion();
-
-  // state
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [selectedAnswer, setSelectedAnswer] = useState<string[]>([]);
+  const [questionIndex, setQuestionIndex] = useState<number | null>(() => {
+    return Math.floor(Math.random() * questionsMock.length);
+  });
   const [correctAnswers, setCorrectAnswers] = useState<number[]>([]);
   const [incorrectAnswers, setIncorrectAnswers] = useState<number[]>([]);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [selectedAnswer, setSelectedAnswer] = useState<string[]>([]);
 
-  // variables
-  const isMultiAnswer = Array.isArray(question.correct);
-  const isDisabled = isMultiAnswer ? selectedAnswer.length != 2 : !selectedAnswer.length
-  const answeredLetters = selectedAnswer.map(answer => answer[0]).sort().join(' and ');
-  const correctLetters = Array.isArray(question.correct)
-    ? question.correct.map(answer => answer[0]).join(' and ')
-    : question.correct[0];
+  const answeredIds = [...correctAnswers, ...incorrectAnswers];
+  const remainingIndices = questionsMock
+    .map((_, index) => index)
+    .filter((index) => !answeredIds.includes(questionsMock[index].id));
+  const question =
+    questionIndex !== null ? questionsMock[questionIndex] : null;
+  const totalQuestions = questionsMock.length;
 
-  // functions
+  const answeredLetters = selectedAnswer
+  .map((answer) => answer[0])
+  .sort()
+  .join(' and ');
+  
+  const correctLetters = Array.isArray(question?.correct)
+    ? question.correct.map((answer) => answer[0]).sort().join(' and ')
+    : question?.correct[0] || '';
+
+  const nextQuestion = () => {
+    if (remainingIndices.length === 0) {
+      setQuestionIndex(null);
+      return;
+    }
+    const newIndex = remainingIndices[Math.floor(Math.random() * remainingIndices.length)];
+    setQuestionIndex(newIndex);
+    setSelectedAnswer([]);
+    setIsSubmitted(false);
+  };
+
+  const handleSubmit = () => {
+    if (!question) return;
+
+    if (isSubmitted) {
+      nextQuestion();
+      return;
+    }
+
+    const isCorrect = answeredLetters === correctLetters;
+    if (isCorrect) {
+      setCorrectAnswers((prev) => [...prev, question.id]);
+    } else {
+      setIncorrectAnswers((prev) => [...prev, question.id]);
+    }
+
+    setIsSubmitted(true);
+  };
+
   const handleAnswerSelect = (item: string) => {
     if (!isSubmitted) {
       setSelectedAnswer((prev) =>
-        isMultiAnswer
+        Array.isArray(question?.correct)
           ? prev.includes(item)
             ? prev.filter((answer) => answer !== item)
             : [...prev, item]
@@ -35,34 +71,33 @@ const App: React.FC = () => {
     }
   };
 
-  const handleSubmit = () => {
-    // Toggle submission state
-    setIsSubmitted(prevState => !prevState);
-  
-    // If already submitted, move to the next question
-    if (isSubmitted) {
-      nextQuestion();
-      setSelectedAnswer([]);
-      return;
-    }
-  
-    // Check if the answer is correct and update the respective arrays
-    const isCorrect = answeredLetters === correctLetters;
-    const updatedAnswers = isCorrect ? correctAnswers : incorrectAnswers;
-    const setUpdatedAnswers = isCorrect ? setCorrectAnswers : setIncorrectAnswers;
-  
-    setUpdatedAnswers([...updatedAnswers, question.id]);
-  };
+  if (!question) {
+    return (
+      <div className="finished">
+        <div className='finished-content'>
+          <h1>Quiz Completed!</h1>
+          <AnswerStatus
+            isSubmitted={false}
+            correctLetters=""
+            answeredLetters=""
+            correctAnswersCount={correctAnswers.length}
+            incorrectAnswersCount={incorrectAnswers.length}
+            totalQuestions={totalQuestions}
+          />
+        </div>
+      </div>
+    );
+  }
 
-  // render
   return (
-    <div className='app-wrapper'>
+    <div className="app-wrapper">
       <AnswerStatus
         isSubmitted={isSubmitted}
         correctLetters={correctLetters}
         answeredLetters={answeredLetters}
         correctAnswersCount={correctAnswers.length}
         incorrectAnswersCount={incorrectAnswers.length}
+        totalQuestions={totalQuestions}
       />
       <QuestionCard
         question={question}
@@ -70,8 +105,11 @@ const App: React.FC = () => {
         selectedAnswer={selectedAnswer}
         onSelectAnswer={handleAnswerSelect}
       />
-      <div className='footer'>
-        <button disabled={isDisabled} onClick={handleSubmit}>
+      <div className="footer">
+        <button
+          disabled={!selectedAnswer.length || (Array.isArray(question.correct) && selectedAnswer.length !== 2)}
+          onClick={handleSubmit}
+        >
           {isSubmitted ? 'Next' : 'Submit'}
         </button>
       </div>
