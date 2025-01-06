@@ -11,7 +11,7 @@
 
 .question-wrapper {
   padding: 30px;
-  margin: 30px auto;
+  margin: 0px auto;
   max-width: 800px;
   text-align: left;
   background-color: #333;
@@ -52,6 +52,29 @@
   }
 }
 
+.answer-status {
+  padding: 0 30px;
+  margin: 20px auto;
+  max-width: 800px;
+  min-height: 56px;
+  border-radius: 10px;
+  display: flex;
+  justify-self: center;
+  justify-content: space-between;
+  font-weight: 600;
+  background-color: #555;
+}
+
+.answer-correct {
+  color: darkgreen;
+  background-color: #a6ef93;
+}
+
+.answer-incorrect {
+  color: maroon;
+  background-color: lightcoral;
+}
+
 .question-line {
   padding-bottom: 30px;
   border-bottom: 1px solid #666;
@@ -60,6 +83,10 @@
     padding: 5px 10px;
     font-size: 16px;
   }
+}
+
+.footer {
+  margin: 20px auto;
 }
 
 .read-the-docs {

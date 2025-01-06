@@ -12,7 +12,7 @@ interface QuestionCardProps {
   onSelectAnswer: (answer: string) => void;
 }
 
-export const QuestionCard: React.FC<QuestionCardProps> = ({
+const QuestionCard: React.FC<QuestionCardProps> = ({
   question,
   isSubmitted,
   selectedAnswer,
@@ -51,3 +51,5 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     </div>
   );
 };
+
+export default QuestionCard;

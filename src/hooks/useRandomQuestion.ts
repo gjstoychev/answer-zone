@@ -15,5 +15,7 @@ export const useRandomQuestion = () => {
     totalQuestions: questionsMock.length,
   };
 
-  return { question, nextQuestion, questionIndex };
+  const totalQuestions = questionsMock.length;
+
+  return { question, nextQuestion, totalQuestions };
 };
