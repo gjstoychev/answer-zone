@@ -39,6 +39,7 @@ Before you begin, ensure you have the following installed:
 
 ## Folder Structure
 
+```
 answer-zone/
 ├── public/          # Static assets (favicon, images, etc.)
 ├── src/             # Source code
@@ -50,6 +51,7 @@ answer-zone/
 ├── package.json     # Project configuration and dependencies
 ├── tsconfig.json    # TypeScript configuration
 └── vite.config.ts   # Vite configuration
+```
 
 ## Contributing
 
