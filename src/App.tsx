@@ -27,7 +27,7 @@ const App: React.FC = () => {
   .join(' and ');
   
   const correctLetters = Array.isArray(question?.correct)
-    ? question.correct.map((answer) => answer[0]).sort().join(' and ')
+    ? question.correct.map((answer: string) => answer[0]).sort().join(' and ')
     : question?.correct[0] || '';
 
   const nextQuestion = () => {
