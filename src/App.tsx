@@ -43,7 +43,7 @@ const App: React.FC = () => {
         selectedAnswer={selectedAnswer}
         onSelectAnswer={handleAnswerSelect}
       />
-      <div className='footer'>
+      <div>
         <button disabled={isDisabled} onClick={handleSubmit}>
           {isSubmitted ? 'Next' : 'Submit'}
         </button>
