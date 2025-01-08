@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { QuestionType } from '../types';
+import { useState } from "react";
+import { QuestionType } from "../types";
 
 export const useQuestionState = (questions: QuestionType[]) => {
   const [questionIndex, setQuestionIndex] = useState<number | null>(() =>

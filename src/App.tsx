@@ -100,7 +100,7 @@ const App: React.FC = () => {
         <div className="quiz-status">
           <h1>{showStatus ? "Quiz paused" : "Quiz Completed!"}</h1>
           {!!incorrectAnswers.length && (
-            <h2>Incorrect Answers Report ({incorrectAnswers.length})</h2>
+            <h2 className="quiz-status-subheader">Incorrect Answers Report ({incorrectAnswers.length})</h2>
           )}
           <IncorrectList
             incorrectQuestions={incorrectQuestions}

@@ -1,5 +1,5 @@
-import React from 'react';
-import Answer from './Answer';
+import React from "react";
+import Answer from "./Answer";
 
 interface QuestionCardProps {
   question: {
@@ -24,24 +24,24 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   const getAnswerClass = (answer: string) => {
     const isAnswerSelected = selectedAnswer.includes(answer);
   
-    if (!isSubmitted) return isAnswerSelected ? 'selected' : '';
+    if (!isSubmitted) return isAnswerSelected ? "selected" : "";
   
     const isCorrectAnswer = Array.isArray(correct)
       ? correct.includes(answer)
       : answer === correct;
   
-    if (isCorrectAnswer) return 'correct';
-    if (isAnswerSelected) return 'wrong';
+    if (isCorrectAnswer) return "correct";
+    if (isAnswerSelected) return "wrong";
 
-    return 'skipped';
+    return "skipped";
   };
 
   const handleClick = (answer: string) => onSelectAnswer && onSelectAnswer(answer)
   
   return (
-    <div className='question-wrapper'>
-      <p className='question-line'>{questionText}</p>
-      <div className='answers-wrapper'>
+    <div className="question-wrapper">
+      <p className="question-line">{questionText}</p>
+      <div className="answers-wrapper">
         {answers.map((answer, index) => (
           <Answer
             key={index.toString() + id}

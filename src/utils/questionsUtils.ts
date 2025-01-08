@@ -1,4 +1,4 @@
-import { QuestionType, IncorrectAnswerType } from '../types';
+import { QuestionType, IncorrectAnswerType } from "../types";
 
 export const getRemainingIndices = (questions: QuestionType[], answeredIds: number[]): number[] =>
   questions.map((_, index) => index).filter((index) => !answeredIds.includes(questions[index].id));
