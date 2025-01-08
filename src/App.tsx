@@ -4,7 +4,7 @@ import AnswerStatus from "./components/AnswerStatus";
 import QuestionCard from "./components/QuestionCard";
 import IncorrectList from "./components/IncorrectList";
 import { useQuestionState } from "./hooks/useQuestionState";
-import { saveToStorage, getFromStorage } from "./utils/storageUtils";
+import { saveToStorage, getFromStorage, removeFromStorage } from "./utils/storageUtils";
 import { getRemainingIndices, getIncorrectQuestions, formatAnswers } from "./utils/questionsUtils";
 import { IncorrectAnswerType } from "./types";
 import "./App.css";
@@ -85,6 +85,21 @@ const App: React.FC = () => {
     }
   };
 
+  const handleReset = () => {
+    // Clear state
+    setCorrectAnswers([]);
+    setIncorrectAnswers([]);
+  
+    // Clear localStorage
+    removeFromStorage("correctAnswers");
+    removeFromStorage("incorrectAnswers");
+  
+    // Recalculate indices after resetting state
+    const newRemainingIndices = combinedQuestions.map((_, index) => index);
+    // Start with a fresh question
+    nextQuestion(newRemainingIndices);
+  };
+
   if (!question || showStatus) {
     return (
       <div className="app-wrapper">
@@ -106,11 +121,12 @@ const App: React.FC = () => {
             incorrectQuestions={incorrectQuestions}
             incorrectAnswers={incorrectAnswers}
           />
-          {showStatus && question && (
-            <div className="footer">
+          <div className="footer">
+            {showStatus && question && (
               <button onClick={() => setShowStatus((prev) => !prev)}>Resume</button>
-            </div>
-          )}
+            )}
+            {!question && <button onClick={handleReset}>Reset</button>}
+          </div>
         </div>
       </div>
     );
