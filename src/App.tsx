@@ -1,25 +1,26 @@
 import React, { useState } from 'react';
-import { questionsMock } from './data/questionsMock';
+import { combinedQuestions} from './data/combinedQuestions';
 import AnswerStatus from './components/AnswerStatus';
 import QuestionCard from './components/QuestionCard';
 import './App.css';
 
 const App: React.FC = () => {
   const [questionIndex, setQuestionIndex] = useState<number | null>(() => {
-    return Math.floor(Math.random() * questionsMock.length);
+    return Math.floor(Math.random() * combinedQuestions.length);
   });
-  const [correctAnswers, setCorrectAnswers] = useState<number[]>([]);
-  const [incorrectAnswers, setIncorrectAnswers] = useState<number[]>([]);
+  const [showStatus, setShowStatus] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<string[]>([]);
+  const [correctAnswers, setCorrectAnswers] = useState<number[]>([]);
+  const [incorrectAnswers, setIncorrectAnswers] = useState<number[]>([]);
 
   const answeredIds = [...correctAnswers, ...incorrectAnswers];
-  const remainingIndices = questionsMock
+  const remainingIndices = combinedQuestions
     .map((_, index) => index)
-    .filter((index) => !answeredIds.includes(questionsMock[index].id));
+    .filter((index) => !answeredIds.includes(combinedQuestions[index].id));
   const question =
-    questionIndex !== null ? questionsMock[questionIndex] : null;
-  const totalQuestions = questionsMock.length;
+    questionIndex !== null ? combinedQuestions[questionIndex] : null;
+  const totalQuestions = combinedQuestions.length;
 
   const answeredLetters = selectedAnswer
   .map((answer) => answer[0])
@@ -29,6 +30,10 @@ const App: React.FC = () => {
   const correctLetters = Array.isArray(question?.correct)
     ? question.correct.map((answer: string) => answer[0]).sort().join(' and ')
     : question?.correct[0] || '';
+
+  const incorrectQuestions = combinedQuestions.filter((question) =>
+    incorrectAnswers.includes(question.id)
+  );
 
   const nextQuestion = () => {
     if (remainingIndices.length === 0) {
@@ -71,19 +76,38 @@ const App: React.FC = () => {
     }
   };
 
-  if (!question) {
+  if (!question || showStatus) {
     return (
-      <div className="finished">
-        <div className='finished-content'>
-          <h1>Quiz Completed!</h1>
-          <AnswerStatus
-            isSubmitted={false}
-            correctLetters=""
-            answeredLetters=""
-            correctAnswersCount={correctAnswers.length}
-            incorrectAnswersCount={incorrectAnswers.length}
-            totalQuestions={totalQuestions}
-          />
+      <div className="app-wrapper">
+        <AnswerStatus
+          isSubmitted={false}
+          correctLetters=""
+          answeredLetters=""
+          correctAnswersCount={correctAnswers.length}
+          incorrectAnswersCount={incorrectAnswers.length}
+          totalQuestions={totalQuestions}
+          onResume={() => setShowStatus((prev) => !prev)}
+        />
+        <div className='quiz-status'>
+          <h1>{showStatus ? "Quiz paused" : "Quiz Completed!"}</h1>
+          {!!incorrectAnswers.length && <h2>Incorrect Answers Report ({incorrectAnswers.length})</h2>}
+          {incorrectQuestions.map((question) => (
+            <React.Fragment key={question.id}>
+              <QuestionCard
+                question={question}
+                isSubmitted={true}
+                selectedAnswer={[]}
+              />
+              <hr />
+            </React.Fragment>
+          ))}
+          {showStatus && question && (
+            <div className='footer'>
+              <button onClick={() => setShowStatus((prev) => !prev)}>
+                Resume
+              </button>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -98,6 +122,7 @@ const App: React.FC = () => {
         correctAnswersCount={correctAnswers.length}
         incorrectAnswersCount={incorrectAnswers.length}
         totalQuestions={totalQuestions}
+        onResume={() => setShowStatus((prev) => !prev)}
       />
       <QuestionCard
         question={question}

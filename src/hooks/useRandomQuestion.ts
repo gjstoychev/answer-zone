@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { questionsMock } from '../data/questionsMock.ts';
+import { combinedQuestions } from '../data/combinedQuestions.ts';
 
 interface UseRandomQuestionProps {
   answeredQuestionsRef: React.MutableRefObject<number[]>; // Pass a ref to track answered questions
@@ -7,7 +7,7 @@ interface UseRandomQuestionProps {
 
 export const useRandomQuestion = ({ answeredQuestionsRef }: UseRandomQuestionProps) => {
   const [questionIndex, setQuestionIndex] = useState<number | null>(() => {
-    const remainingIndices = questionsMock
+    const remainingIndices = combinedQuestions
       .map((_, index) => index)
       .filter(index => !answeredQuestionsRef.current.includes(index));
 
@@ -17,7 +17,7 @@ export const useRandomQuestion = ({ answeredQuestionsRef }: UseRandomQuestionPro
   });
 
   const nextQuestion = () => {
-    const remainingIndices = questionsMock
+    const remainingIndices = combinedQuestions
       .map((_, index) => index)
       .filter(index => !answeredQuestionsRef.current.includes(index));
 
@@ -31,12 +31,12 @@ export const useRandomQuestion = ({ answeredQuestionsRef }: UseRandomQuestionPro
 
   const question = questionIndex !== null
     ? {
-        ...questionsMock[questionIndex],
-        totalQuestions: questionsMock.length,
+        ...combinedQuestions[questionIndex],
+        totalQuestions: combinedQuestions.length,
       }
     : null;
 
-  const totalQuestions = questionsMock.length;
+  const totalQuestions = combinedQuestions.length;
 
   return { question, nextQuestion, totalQuestions };
 };

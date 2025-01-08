@@ -3,13 +3,14 @@ import Answer from './Answer';
 
 interface QuestionCardProps {
   question: {
+    id: number;
     question: string;
     answers: string[];
     correct: string | string[];
   };
   isSubmitted: boolean;
   selectedAnswer: string[];
-  onSelectAnswer: (answer: string) => void;
+  onSelectAnswer?: (answer: string) => void;
 }
 
 const QuestionCard: React.FC<QuestionCardProps> = ({
@@ -18,7 +19,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   selectedAnswer,
   onSelectAnswer,
 }) => {
-  const { question: questionText, answers, correct } = question;
+  const { id, question: questionText, answers, correct } = question;
 
   const getAnswerClass = (answer: string) => {
     const isAnswerSelected = selectedAnswer.includes(answer);
@@ -34,17 +35,19 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
 
     return 'skipped';
   };
+
+  const handleClick = (answer: string) => onSelectAnswer && onSelectAnswer(answer)
   
   return (
     <div className='question-wrapper'>
       <p className='question-line'>{questionText}</p>
       <div className='answers-wrapper'>
-        {answers.map((answer) => (
+        {answers.map((answer, index) => (
           <Answer
-            key={answer}
+            key={index.toString() + id}
             answer={answer}
             className={getAnswerClass(answer)}
-            onClick={() => onSelectAnswer(answer)}
+            onClick={() => handleClick(answer)}
           />
         ))}
       </div>
