@@ -33,8 +33,8 @@ const AnswerStatus: React.FC<AnswerStatusProps> = ({
       {isSubmitted ? (
         <>
           <p>{answerStatus}</p>
-          <LetterCircles title="Your Answer:" letters={answeredLetters} />
-          <LetterCircles title="Correct Answer:" letters={correctLetters} />
+          <LetterCircles title="Answered:" letters={answeredLetters} />
+          <LetterCircles title="Correct:" letters={correctLetters} />
         </>
       ) : (
         <>

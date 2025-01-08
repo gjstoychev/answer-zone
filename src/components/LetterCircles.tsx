@@ -8,7 +8,7 @@ interface LetterCirclesProps {
 const LetterCircles: React.FC<LetterCirclesProps> = ({ title, letters }) => (
   <span className="status-circle">
     <p>{title}</p>
-    {letters.split(" and ").map((letter, index) => (
+    {letters.split(",").map((letter, index) => (
       <span key={index} className="circle">
         {letter}
       </span>

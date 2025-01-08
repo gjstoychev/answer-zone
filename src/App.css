@@ -19,7 +19,7 @@
 
 .question-wrapper {
   padding: 10px 30px;
-  margin: 30px auto;
+  margin: 0 auto; 
   max-width: 800px;
   text-align: left;
   background-color: #333;
@@ -89,6 +89,15 @@
   font-size: 18px;
   text-align: justify;
   border-bottom: 1px solid #666;
+}
+
+.general-answers-status {
+  padding-bottom: 24px;
+  margin: 0 30px;
+  margin-top: 0;
+  display: flex;
+  justify-content: space-evenly;
+  border-bottom: 1px solid silver;
 }
 
 .status-circle {

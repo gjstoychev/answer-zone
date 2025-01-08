@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { combinedQuestions} from './data/combinedQuestions';
 import AnswerStatus from './components/AnswerStatus';
 import QuestionCard from './components/QuestionCard';
+import LetterCircles from './components/LetterCircles';
 import './App.css';
 
 const App: React.FC = () => {
@@ -12,7 +13,7 @@ const App: React.FC = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<string[]>([]);
   const [correctAnswers, setCorrectAnswers] = useState<number[]>([]);
-  const [incorrectAnswers, setIncorrectAnswers] = useState<number[]>([]);
+  const [incorrectAnswers, setIncorrectAnswers] = useState<{ id: number; given: string[] }[]>([]);
 
   const answeredIds = [...correctAnswers, ...incorrectAnswers];
   const remainingIndices = combinedQuestions
@@ -22,17 +23,14 @@ const App: React.FC = () => {
     questionIndex !== null ? combinedQuestions[questionIndex] : null;
   const totalQuestions = combinedQuestions.length;
 
-  const answeredLetters = selectedAnswer
-  .map((answer) => answer[0])
-  .sort()
-  .join(' and ');
+  const answeredLetters = selectedAnswer.map((answer) => answer[0]).sort().join(',');
   
   const correctLetters = Array.isArray(question?.correct)
-    ? question.correct.map((answer: string) => answer[0]).sort().join(' and ')
+    ? question.correct.map((answer: string) => answer[0]).sort().join(',')
     : question?.correct[0] || '';
 
   const incorrectQuestions = combinedQuestions.filter((question) =>
-    incorrectAnswers.includes(question.id)
+    incorrectAnswers.some((item) => item.id === question.id)
   );
 
   const nextQuestion = () => {
@@ -58,7 +56,10 @@ const App: React.FC = () => {
     if (isCorrect) {
       setCorrectAnswers((prev) => [...prev, question.id]);
     } else {
-      setIncorrectAnswers((prev) => [...prev, question.id]);
+      setIncorrectAnswers((prev) => [
+        ...prev,
+        { id: question.id, given: selectedAnswer },
+      ]);
     }
 
     setIsSubmitted(true);
@@ -91,16 +92,28 @@ const App: React.FC = () => {
         <div className='quiz-status'>
           <h1>{showStatus ? "Quiz paused" : "Quiz Completed!"}</h1>
           {!!incorrectAnswers.length && <h2>Incorrect Answers Report ({incorrectAnswers.length})</h2>}
-          {incorrectQuestions.map((question) => (
-            <React.Fragment key={question.id}>
-              <QuestionCard
-                question={question}
-                isSubmitted={true}
-                selectedAnswer={[]}
-              />
-              <hr />
-            </React.Fragment>
-          ))}
+
+          {incorrectQuestions.map((question) => {
+            const givenAnswers = incorrectAnswers.find((item) => item.id === question.id)?.given || [];
+            const answeredHistoryLetters = givenAnswers.map((answer) => answer[0]).sort().join(',');
+            const correctHistoryLetters = Array.isArray(question.correct)
+              ? question.correct.map((answer) => answer[0]).sort().join(',')
+              : question.correct[0] || '';
+
+            return (
+              <React.Fragment key={question.id}>
+                <QuestionCard
+                  question={question}
+                  isSubmitted={true}
+                  selectedAnswer={givenAnswers || []}
+                />
+                <div className="general-answers-status">
+                  <LetterCircles title="Answered:" letters={answeredHistoryLetters} />
+                  <LetterCircles title="Correct:" letters={correctHistoryLetters} />
+                </div>
+              </React.Fragment>
+            );
+          })}
           {showStatus && question && (
             <div className='footer'>
               <button onClick={() => setShowStatus((prev) => !prev)}>
