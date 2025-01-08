@@ -1,55 +1,45 @@
 import React, { useState } from 'react';
 import { combinedQuestions } from './data/combinedQuestions';
-import { formatAnswers } from './utils/answers';
 import AnswerStatus from './components/AnswerStatus';
 import QuestionCard from './components/QuestionCard';
-import LetterCircles from './components/LetterCircles';
+import IncorrectList from './components/IncorrectList';
+import { formatAnswers } from './utils/answers';
+import { getRemainingIndices, getIncorrectQuestions } from './utils/questions';
+import { useQuestionState } from './hooks/useQuestionState';
+import { IncorrectAnswerType } from './types';
 import './App.css';
 
 const App: React.FC = () => {
-  const [questionIndex, setQuestionIndex] = useState<number | null>(() => {
-    return Math.floor(Math.random() * combinedQuestions.length);
-  });
-  const [showStatus, setShowStatus] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [selectedAnswer, setSelectedAnswer] = useState<string[]>([]);
   const [correctAnswers, setCorrectAnswers] = useState<number[]>([]);
-  const [incorrectAnswers, setIncorrectAnswers] = useState<{ id: number; given: string[] }[]>([]);
+  const [incorrectAnswers, setIncorrectAnswers] = useState<IncorrectAnswerType[]>([]);
+  const [showStatus, setShowStatus] = useState(false);
 
-  const answeredIds = [...correctAnswers, ...incorrectAnswers];
-  const remainingIndices = combinedQuestions
-    .map((_, index) => index)
-    .filter((index) => !answeredIds.includes(combinedQuestions[index].id));
-  const question =
-    questionIndex !== null ? combinedQuestions[questionIndex] : null;
+  const answeredIds = [...correctAnswers, ...incorrectAnswers.map((item) => item.id)];
+  const remainingIndices = getRemainingIndices(combinedQuestions, answeredIds);
+  const incorrectQuestions = getIncorrectQuestions(combinedQuestions, incorrectAnswers);
+
+  const {
+    question,
+    selectedAnswer,
+    isSubmitted,
+    setSelectedAnswer,
+    setIsSubmitted,
+    nextQuestion,
+  } = useQuestionState(combinedQuestions);
+
   const totalQuestions = combinedQuestions.length;
 
   const answeredLetters = formatAnswers(selectedAnswer);
 
-  const correctLetters = question
-    ? formatAnswers(Array.isArray(question.correct) ? question.correct : [question.correct])
-    : '';
-
-  const incorrectQuestions = combinedQuestions.filter((question) =>
-    incorrectAnswers.some((item) => item.id === question.id)
+  const correctLetters = formatAnswers(
+    Array.isArray(question?.correct) ? question.correct : [question?.correct || '']
   );
-
-  const nextQuestion = () => {
-    if (remainingIndices.length === 0) {
-      setQuestionIndex(null);
-      return;
-    }
-    const newIndex = remainingIndices[Math.floor(Math.random() * remainingIndices.length)];
-    setQuestionIndex(newIndex);
-    setSelectedAnswer([]);
-    setIsSubmitted(false);
-  };
 
   const handleSubmit = () => {
     if (!question) return;
 
     if (isSubmitted) {
-      nextQuestion();
+      nextQuestion(remainingIndices);
       return;
     }
 
@@ -92,34 +82,16 @@ const App: React.FC = () => {
         />
         <div className="quiz-status">
           <h1>{showStatus ? "Quiz paused" : "Quiz Completed!"}</h1>
-          {!!incorrectAnswers.length && <h2>Incorrect Answers Report ({incorrectAnswers.length})</h2>}
-
-          {incorrectQuestions.map((question) => {
-            const givenAnswers = incorrectAnswers.find((item) => item.id === question.id)?.given || [];
-            const answeredHistoryLetters = formatAnswers(givenAnswers);
-            const correctHistoryLetters = formatAnswers(
-              Array.isArray(question.correct) ? question.correct : [question.correct]
-            );
-
-            return (
-              <React.Fragment key={question.id}>
-                <QuestionCard
-                  question={question}
-                  isSubmitted={true}
-                  selectedAnswer={givenAnswers || []}
-                />
-                <div className="general-answers-status">
-                  <LetterCircles title="Answered:" letters={answeredHistoryLetters} />
-                  <LetterCircles title="Correct:" letters={correctHistoryLetters} />
-                </div>
-              </React.Fragment>
-            );
-          })}
+          {!!incorrectAnswers.length && (
+            <h2>Incorrect Answers Report ({incorrectAnswers.length})</h2>
+          )}
+          <IncorrectList
+            incorrectQuestions={incorrectQuestions}
+            incorrectAnswers={incorrectAnswers}
+          />
           {showStatus && question && (
             <div className="footer">
-              <button onClick={() => setShowStatus((prev) => !prev)}>
-                Resume
-              </button>
+              <button onClick={() => setShowStatus((prev) => !prev)}>Resume</button>
             </div>
           )}
         </div>

@@ -46,7 +46,8 @@ answer-zone/
 │   ├── components/  # React components
 │   ├── hooks/       # Custom hooks
 │   ├── utils/       # Utility methods
-│   ├── data/        # Questions Data JSON
+│   ├── data/        # Questions data
+│   ├── type.ts      # TypeScript interfaces
 │   ├── App.tsx      # Main App component
 │   └── App.css      # Main App styles
 ├── package.json     # Project configuration and dependencies
