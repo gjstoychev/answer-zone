@@ -45,6 +45,7 @@ answer-zone/
 ├── src/             # Source code
 │   ├── components/  # React components
 │   ├── hooks/       # Custom hooks
+│   ├── utils/       # Utility methods
 │   ├── data/        # Questions Data JSON
 │   ├── App.tsx      # Main App component
 │   └── App.css      # Main App styles
@@ -59,3 +60,6 @@ Contributions are welcome! If you'd like to report an issue or propose a feature
 
 ## License
 This project is licensed under the MIT License.
+
+## Disclaimer
+This repository is not affiliated with or endorsed by AWS. The content is intended for educational purposes and is based on publicly available information. It does not include any material that violates AWS’s certification policies or NDA.
