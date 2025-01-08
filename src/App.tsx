@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { combinedQuestions } from './data/combinedQuestions';
-import AnswerStatus from './components/AnswerStatus';
-import QuestionCard from './components/QuestionCard';
-import IncorrectList from './components/IncorrectList';
-import { formatAnswers } from './utils/answers';
-import { getRemainingIndices, getIncorrectQuestions } from './utils/questions';
-import { useQuestionState } from './hooks/useQuestionState';
-import { IncorrectAnswerType } from './types';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import { combinedQuestions } from "./data/combinedQuestions";
+import AnswerStatus from "./components/AnswerStatus";
+import QuestionCard from "./components/QuestionCard";
+import IncorrectList from "./components/IncorrectList";
+import { useQuestionState } from "./hooks/useQuestionState";
+import { saveToStorage, getFromStorage } from "./utils/storageUtils";
+import { getRemainingIndices, getIncorrectQuestions, formatAnswers } from "./utils/questionsUtils";
+import { IncorrectAnswerType } from "./types";
+import "./App.css";
 
 const App: React.FC = () => {
   const [correctAnswers, setCorrectAnswers] = useState<number[]>([]);
@@ -35,6 +35,18 @@ const App: React.FC = () => {
     Array.isArray(question?.correct) ? question.correct : [question?.correct || '']
   );
 
+  useEffect(() => {
+    const storedIncorrectAnswers = getFromStorage<IncorrectAnswerType[]>("incorrectAnswers");
+    const storedCorrectAnswers = getFromStorage<number[]>("correctAnswers");
+  
+    if (storedIncorrectAnswers) {
+      setIncorrectAnswers(storedIncorrectAnswers);
+    }
+    if (storedCorrectAnswers) {
+      setCorrectAnswers(storedCorrectAnswers);
+    }
+  }, []);
+
   const handleSubmit = () => {
     if (!question) return;
 
@@ -43,14 +55,19 @@ const App: React.FC = () => {
       return;
     }
 
-    const isCorrect = answeredLetters === correctLetters;
-    if (isCorrect) {
-      setCorrectAnswers((prev) => [...prev, question.id]);
+    if (answeredLetters === correctLetters) {
+      setCorrectAnswers((prev) => {
+        const updatedCorrectAnswers = [...prev, question.id];
+        saveToStorage("correctAnswers", updatedCorrectAnswers);
+        return updatedCorrectAnswers;
+      });
     } else {
-      setIncorrectAnswers((prev) => [
-        ...prev,
-        { id: question.id, given: selectedAnswer },
-      ]);
+      const newIncorrectAnswer = { id: question.id, given: selectedAnswer };
+      setIncorrectAnswers((prev) => {
+        const updatedIncorrectAnswers = [...prev, newIncorrectAnswer];
+        saveToStorage("incorrectAnswers", updatedIncorrectAnswers);
+        return updatedIncorrectAnswers;
+      });
     }
 
     setIsSubmitted(true);
@@ -121,7 +138,7 @@ const App: React.FC = () => {
           disabled={!selectedAnswer.length || (Array.isArray(question.correct) && selectedAnswer.length !== 2)}
           onClick={handleSubmit}
         >
-          {isSubmitted ? 'Next' : 'Submit'}
+          {isSubmitted ? "Next" : "Submit"}
         </button>
       </div>
     </div>

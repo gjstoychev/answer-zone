@@ -8,4 +8,6 @@ export const getIncorrectQuestions = (
   incorrectAnswers: IncorrectAnswerType[]
 ): QuestionType[] =>
   questions.filter((question) => incorrectAnswers.some((item) => item.id === question.id));
-  
+
+export const formatAnswers = (answers: string[]): string => 
+  answers.map((answer) => answer[0]).sort().join(',');

@@ -2,7 +2,7 @@ import React from 'react';
 import QuestionCard from './QuestionCard';
 import LetterCircles from './LetterCircles';
 import { QuestionType, IncorrectAnswerType } from '../types';
-import { formatAnswers } from '../utils/answers';
+import { formatAnswers } from '../utils/questionsUtils';
 
 interface Props {
   incorrectQuestions: QuestionType[];
