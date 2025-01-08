@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { combinedQuestions} from './data/combinedQuestions';
+import { combinedQuestions } from './data/combinedQuestions';
+import { formatAnswers } from './utils/answers';
 import AnswerStatus from './components/AnswerStatus';
 import QuestionCard from './components/QuestionCard';
 import LetterCircles from './components/LetterCircles';
@@ -23,11 +24,11 @@ const App: React.FC = () => {
     questionIndex !== null ? combinedQuestions[questionIndex] : null;
   const totalQuestions = combinedQuestions.length;
 
-  const answeredLetters = selectedAnswer.map((answer) => answer[0]).sort().join(',');
-  
-  const correctLetters = Array.isArray(question?.correct)
-    ? question.correct.map((answer: string) => answer[0]).sort().join(',')
-    : question?.correct[0] || '';
+  const answeredLetters = formatAnswers(selectedAnswer);
+
+  const correctLetters = question
+    ? formatAnswers(Array.isArray(question.correct) ? question.correct : [question.correct])
+    : '';
 
   const incorrectQuestions = combinedQuestions.filter((question) =>
     incorrectAnswers.some((item) => item.id === question.id)
@@ -89,16 +90,16 @@ const App: React.FC = () => {
           totalQuestions={totalQuestions}
           onResume={() => setShowStatus((prev) => !prev)}
         />
-        <div className='quiz-status'>
+        <div className="quiz-status">
           <h1>{showStatus ? "Quiz paused" : "Quiz Completed!"}</h1>
           {!!incorrectAnswers.length && <h2>Incorrect Answers Report ({incorrectAnswers.length})</h2>}
 
           {incorrectQuestions.map((question) => {
             const givenAnswers = incorrectAnswers.find((item) => item.id === question.id)?.given || [];
-            const answeredHistoryLetters = givenAnswers.map((answer) => answer[0]).sort().join(',');
-            const correctHistoryLetters = Array.isArray(question.correct)
-              ? question.correct.map((answer) => answer[0]).sort().join(',')
-              : question.correct[0] || '';
+            const answeredHistoryLetters = formatAnswers(givenAnswers);
+            const correctHistoryLetters = formatAnswers(
+              Array.isArray(question.correct) ? question.correct : [question.correct]
+            );
 
             return (
               <React.Fragment key={question.id}>
@@ -115,7 +116,7 @@ const App: React.FC = () => {
             );
           })}
           {showStatus && question && (
-            <div className='footer'>
+            <div className="footer">
               <button onClick={() => setShowStatus((prev) => !prev)}>
                 Resume
               </button>
