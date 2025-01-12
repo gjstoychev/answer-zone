@@ -3,6 +3,7 @@ import { combinedQuestions } from "./data/combinedQuestions";
 import AnswerStatus from "./components/AnswerStatus";
 import QuestionCard from "./components/QuestionCard";
 import IncorrectList from "./components/IncorrectList";
+import CircleIndicator from "./components/CircleIndicator";
 import ConfirmationModal from "./components/ConfirmationModal";
 import { useQuestionState } from "./hooks/useQuestionState";
 import { saveToStorage, getFromStorage, removeFromStorage } from "./utils/storageUtils";
@@ -30,12 +31,18 @@ const App: React.FC = () => {
   } = useQuestionState(combinedQuestions);
 
   const totalQuestions = combinedQuestions.length;
-
   const answeredLetters = formatAnswers(selectedAnswer);
-
   const correctLetters = formatAnswers(
     Array.isArray(question?.correct) ? question.correct : [question?.correct || '']
   );
+  const completedPercentage = Math.round(
+    (1 - remainingIndices.length / totalQuestions) * 100
+  );
+  const successRate = Math.round(
+    (correctAnswers.length /
+      (correctAnswers.length + incorrectAnswers.length)) *
+      100
+  ) || 0;
 
   useEffect(() => {
     const storedIncorrectAnswers = getFromStorage<IncorrectAnswerType[]>("incorrectAnswers") || [];
@@ -44,7 +51,6 @@ const App: React.FC = () => {
     setIncorrectAnswers(storedIncorrectAnswers);
     setCorrectAnswers(storedCorrectAnswers);
   
-    // Calculate remaining indices and call nextQuestion
     const newRemainingIndices = getRemainingIndices(combinedQuestions, [
       ...storedCorrectAnswers,
       ...storedIncorrectAnswers.map((item) => item.id),
@@ -130,7 +136,17 @@ const App: React.FC = () => {
           onResume={() => setShowStatus((prev) => !prev)}
         />
         <div className="quiz-status">
-          <h1>{showStatus ? "Quiz paused" : "Quiz Completed!"}</h1>
+          <div>
+            <h1>Quiz {completedPercentage === 100 ? "Completed!" : "Progress"}</h1>
+            <div style={{ display: "flex", gap: "20px", justifyContent: "center" }}>
+              <CircleIndicator
+                percentage={completedPercentage}
+                label="Progress %"
+              />
+              <CircleIndicator percentage={successRate} label="Accuracy %" />
+            </div>
+          </div>
+
           {!!incorrectAnswers.length && (
             <h2 className="quiz-status-subheader">Incorrect Answers Report ({incorrectAnswers.length})</h2>
           )}
