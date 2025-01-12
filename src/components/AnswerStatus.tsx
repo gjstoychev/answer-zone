@@ -2,7 +2,7 @@ import React from "react";
 import LetterCircles from "./LetterCircles";
 
 interface AnswerStatusProps {
-  isSubmitted: boolean;
+  hasAnswered: boolean;
   correctLetters: string;
   answeredLetters: string;
   correctAnswersCount: number;
@@ -12,7 +12,7 @@ interface AnswerStatusProps {
 }
 
 const AnswerStatus: React.FC<AnswerStatusProps> = ({
-  isSubmitted,
+  hasAnswered,
   correctLetters,
   answeredLetters,
   correctAnswersCount,
@@ -24,13 +24,13 @@ const AnswerStatus: React.FC<AnswerStatusProps> = ({
   const successRate = Math.round((correctAnswersCount / totalAnswersGiven) * 100) || 0;
   const isCorrect = answeredLetters === correctLetters;
   const answerStatus = isCorrect ? "Correct" : "Incorrect";
-  const answerStatusColor = isSubmitted
+  const answerStatusColor = hasAnswered
     ? isCorrect ? "answer-correct" : "answer-incorrect"
     : "";
 
   return (
     <div className={`answer-status ${answerStatusColor}`} onClick={onResume}>
-      {isSubmitted ? (
+      {hasAnswered ? (
         <>
           <p>{answerStatus}</p>
           <LetterCircles title="Answered:" letters={answeredLetters} />

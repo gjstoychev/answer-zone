@@ -23,7 +23,7 @@ const IncorrectList: React.FC<Props> = ({ incorrectQuestions, incorrectAnswers }
           <React.Fragment key={question.id}>
             <QuestionCard
               question={question}
-              isSubmitted={true}
+              hasAnswered={true}
               selectedAnswer={givenAnswers || []}
             />
             <div className="general-answers-status">

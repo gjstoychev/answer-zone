@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { QuestionType } from "../types";
 
 export const useQuestionState = (questions: QuestionType[]) => {
@@ -6,28 +6,32 @@ export const useQuestionState = (questions: QuestionType[]) => {
     Math.floor(Math.random() * questions.length)
   );
   const [selectedAnswer, setSelectedAnswer] = useState<string[]>([]);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [hasAnswered, setHasAnswered] = useState(false);
 
   const question = questionIndex !== null ? questions[questionIndex] : null;
 
-  const nextQuestion = (remainingIndices: number[]) => {
-    if (remainingIndices.length === 0) {
-      setQuestionIndex(null);
-      return;
-    }
-    const newIndex = remainingIndices[Math.floor(Math.random() * remainingIndices.length)];
-    setQuestionIndex(newIndex);
-    setSelectedAnswer([]);
-    setIsSubmitted(false);
-  };
+  const nextQuestion = useCallback(
+    (remainingIndices: number[]) => {
+      if (remainingIndices.length === 0) {
+        // No questions left
+        setQuestionIndex(null);
+        return;
+      }
+      const newIndex = remainingIndices[Math.floor(Math.random() * remainingIndices.length)];
+      setQuestionIndex(newIndex);
+      setSelectedAnswer([]);
+      setHasAnswered(false);
+    },
+    [setQuestionIndex, setSelectedAnswer, setHasAnswered]
+  );
 
   return {
     questionIndex,
     question,
     selectedAnswer,
-    isSubmitted,
+    hasAnswered,
     setSelectedAnswer,
-    setIsSubmitted,
+    setHasAnswered,
     nextQuestion,
   };
 };

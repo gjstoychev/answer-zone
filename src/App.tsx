@@ -3,6 +3,7 @@ import { combinedQuestions } from "./data/combinedQuestions";
 import AnswerStatus from "./components/AnswerStatus";
 import QuestionCard from "./components/QuestionCard";
 import IncorrectList from "./components/IncorrectList";
+import ConfirmationModal from "./components/ConfirmationModal";
 import { useQuestionState } from "./hooks/useQuestionState";
 import { saveToStorage, getFromStorage, removeFromStorage } from "./utils/storageUtils";
 import { getRemainingIndices, getIncorrectQuestions, formatAnswers } from "./utils/questionsUtils";
@@ -13,6 +14,7 @@ const App: React.FC = () => {
   const [correctAnswers, setCorrectAnswers] = useState<number[]>([]);
   const [incorrectAnswers, setIncorrectAnswers] = useState<IncorrectAnswerType[]>([]);
   const [showStatus, setShowStatus] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const answeredIds = [...correctAnswers, ...incorrectAnswers.map((item) => item.id)];
   const remainingIndices = getRemainingIndices(combinedQuestions, answeredIds);
@@ -21,9 +23,9 @@ const App: React.FC = () => {
   const {
     question,
     selectedAnswer,
-    isSubmitted,
+    hasAnswered,
     setSelectedAnswer,
-    setIsSubmitted,
+    setHasAnswered,
     nextQuestion,
   } = useQuestionState(combinedQuestions);
 
@@ -36,21 +38,25 @@ const App: React.FC = () => {
   );
 
   useEffect(() => {
-    const storedIncorrectAnswers = getFromStorage<IncorrectAnswerType[]>("incorrectAnswers");
-    const storedCorrectAnswers = getFromStorage<number[]>("correctAnswers");
+    const storedIncorrectAnswers = getFromStorage<IncorrectAnswerType[]>("incorrectAnswers") || [];
+    const storedCorrectAnswers = getFromStorage<number[]>("correctAnswers") || [];
   
-    if (storedIncorrectAnswers) {
-      setIncorrectAnswers(storedIncorrectAnswers);
-    }
-    if (storedCorrectAnswers) {
-      setCorrectAnswers(storedCorrectAnswers);
-    }
-  }, []);
+    setIncorrectAnswers(storedIncorrectAnswers);
+    setCorrectAnswers(storedCorrectAnswers);
+  
+    // Calculate remaining indices and call nextQuestion
+    const newRemainingIndices = getRemainingIndices(combinedQuestions, [
+      ...storedCorrectAnswers,
+      ...storedIncorrectAnswers.map((item) => item.id),
+    ]);
+  
+    nextQuestion(newRemainingIndices);
+  }, [nextQuestion]);
 
   const handleSubmit = () => {
     if (!question) return;
 
-    if (isSubmitted) {
+    if (hasAnswered) {
       nextQuestion(remainingIndices);
       return;
     }
@@ -70,11 +76,11 @@ const App: React.FC = () => {
       });
     }
 
-    setIsSubmitted(true);
+    setHasAnswered(true);
   };
 
   const handleAnswerSelect = (item: string) => {
-    if (!isSubmitted) {
+    if (!hasAnswered) {
       setSelectedAnswer((prev) =>
         Array.isArray(question?.correct)
           ? prev.includes(item)
@@ -85,26 +91,37 @@ const App: React.FC = () => {
     }
   };
 
-  const handleReset = () => {
+  const handleConfirmReset = () => {
+    setIsModalOpen(false);
+
     // Clear state
     setCorrectAnswers([]);
     setIncorrectAnswers([]);
-  
+
     // Clear localStorage
     removeFromStorage("correctAnswers");
     removeFromStorage("incorrectAnswers");
-  
+
     // Recalculate indices after resetting state
     const newRemainingIndices = combinedQuestions.map((_, index) => index);
+
     // Start with a fresh question
     nextQuestion(newRemainingIndices);
+  };
+
+  const handleCancelReset = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleReset = () => {
+    setIsModalOpen(true);
   };
 
   if (!question || showStatus) {
     return (
       <div className="app-wrapper">
         <AnswerStatus
-          isSubmitted={false}
+          hasAnswered={false}
           correctLetters=""
           answeredLetters=""
           correctAnswersCount={correctAnswers.length}
@@ -128,6 +145,13 @@ const App: React.FC = () => {
             {!question && <button onClick={handleReset}>Reset</button>}
           </div>
         </div>
+        {isModalOpen && (
+          <ConfirmationModal
+            message="This action will reset all progress. Are you sure you want to proceed?"
+            onConfirm={handleConfirmReset}
+            onCancel={handleCancelReset}
+          />
+        )}
       </div>
     );
   }
@@ -135,7 +159,7 @@ const App: React.FC = () => {
   return (
     <div className="app-wrapper">
       <AnswerStatus
-        isSubmitted={isSubmitted}
+        hasAnswered={hasAnswered}
         correctLetters={correctLetters}
         answeredLetters={answeredLetters}
         correctAnswersCount={correctAnswers.length}
@@ -145,7 +169,7 @@ const App: React.FC = () => {
       />
       <QuestionCard
         question={question}
-        isSubmitted={isSubmitted}
+        hasAnswered={hasAnswered}
         selectedAnswer={selectedAnswer}
         onSelectAnswer={handleAnswerSelect}
       />
@@ -154,7 +178,7 @@ const App: React.FC = () => {
           disabled={!selectedAnswer.length || (Array.isArray(question.correct) && selectedAnswer.length !== 2)}
           onClick={handleSubmit}
         >
-          {isSubmitted ? "Next" : "Submit"}
+          {hasAnswered ? "Next" : "Submit"}
         </button>
       </div>
     </div>

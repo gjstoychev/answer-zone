@@ -8,14 +8,14 @@ interface QuestionCardProps {
     answers: string[];
     correct: string | string[];
   };
-  isSubmitted: boolean;
+  hasAnswered: boolean;
   selectedAnswer: string[];
   onSelectAnswer?: (answer: string) => void;
 }
 
 const QuestionCard: React.FC<QuestionCardProps> = ({
   question,
-  isSubmitted,
+  hasAnswered,
   selectedAnswer,
   onSelectAnswer,
 }) => {
@@ -24,7 +24,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   const getAnswerClass = (answer: string) => {
     const isAnswerSelected = selectedAnswer.includes(answer);
   
-    if (!isSubmitted) return isAnswerSelected ? "selected" : "";
+    if (!hasAnswered) return isAnswerSelected ? "selected" : "";
   
     const isCorrectAnswer = Array.isArray(correct)
       ? correct.includes(answer)
