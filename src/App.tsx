@@ -197,21 +197,24 @@ const App: React.FC = () => {
 
   return (
     <div className="app-wrapper">
-      <AnswerStatus
-        hasAnswered={hasAnswered}
-        correctLetters={correctLetters}
-        answeredLetters={answeredLetters}
-        correctAnswersCount={correctAnswers.length}
-        incorrectAnswersCount={incorrectAnswers.length}
-        totalQuestions={totalQuestions}
-        onResume={() => setShowStatus((prev) => !prev)}
-      />
-      <QuestionCard
-        question={question}
-        hasAnswered={hasAnswered}
-        selectedAnswer={selectedAnswer}
-        onSelectAnswer={handleAnswerSelect}
-      />
+      <div className={hasAnswered ? "next" : ""}>
+        <AnswerStatus
+          hasAnswered={hasAnswered}
+          correctLetters={correctLetters}
+          answeredLetters={answeredLetters}
+          correctAnswersCount={correctAnswers.length}
+          incorrectAnswersCount={incorrectAnswers.length}
+          totalQuestions={totalQuestions}
+          onResume={() => setShowStatus((prev) => !prev)}
+        />
+        <QuestionCard
+          question={question}
+          hasAnswered={hasAnswered}
+          selectedAnswer={selectedAnswer}
+          onSelectAnswer={handleAnswerSelect}
+          onGoToNextQuestion={handleSubmit}
+        />
+      </div>
       <button
         className="action-button"
         disabled={!selectedAnswer.length || (Array.isArray(question.correct) && selectedAnswer.length !== 2)}

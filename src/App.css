@@ -45,7 +45,6 @@
     p {
       padding: 5px 10px;
       font-size: 18px;
-      cursor: pointer;
       color: white;
       border: 1px solid #666;
       border-radius: 5px;
@@ -57,19 +56,17 @@
       background-color: #555;
     }
 
+    .active {
+      cursor: pointer;
+    }
+
     .correct {
-      cursor: default;
       color: #333;
       background-color: #a6ef93;
     }
 
     .wrong {
-      cursor: default;
       background-color: lightcoral;
-    }
-
-    .skipped {
-      cursor: default;
     }
 
     .definition {
@@ -80,6 +77,10 @@
       font-weight: 300;
     }
   }
+}
+
+.next {
+  cursor: e-resize;
 }
 
 .answer-status {
