@@ -14,7 +14,8 @@ import "./App.css";
 const App: React.FC = () => {
   const [correctAnswers, setCorrectAnswers] = useState<number[]>([]);
   const [incorrectAnswers, setIncorrectAnswers] = useState<IncorrectAnswerType[]>([]);
-  const [showStatus, setShowStatus] = useState(false);
+  const [showStatus, setShowStatus] = useState(true);
+  const [showReport, setShowReport] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const answeredIds = [...correctAnswers, ...incorrectAnswers.map((item) => item.id)];
@@ -99,19 +100,14 @@ const App: React.FC = () => {
 
   const handleConfirmReset = () => {
     setIsModalOpen(false);
-
-    // Clear state
+    setShowStatus(true);
     setCorrectAnswers([]);
     setIncorrectAnswers([]);
 
-    // Clear localStorage
     removeFromStorage("correctAnswers");
     removeFromStorage("incorrectAnswers");
 
-    // Recalculate indices after resetting state
     const newRemainingIndices = combinedQuestions.map((_, index) => index);
-
-    // Start with a fresh question
     nextQuestion(newRemainingIndices);
   };
 
@@ -136,30 +132,57 @@ const App: React.FC = () => {
           onResume={() => setShowStatus((prev) => !prev)}
         />
         <div className="quiz-status">
-          <div>
-            <h1>Quiz {completedPercentage === 100 ? "Completed!" : "Progress"}</h1>
-            <div style={{ display: "flex", gap: "20px", justifyContent: "center" }}>
-              <CircleIndicator
-                percentage={completedPercentage}
-                label="Progress %"
-              />
-              <CircleIndicator percentage={successRate} label="Accuracy %" />
-            </div>
-          </div>
-
-          {!!incorrectAnswers.length && (
-            <h2 className="quiz-status-subheader">Incorrect Answers Report ({incorrectAnswers.length})</h2>
+          {completedPercentage ? (
+            <>
+              <h1>Quiz {completedPercentage === 100 ? "Completed!" : "Progress"}</h1>
+              <div className="progress-wrapper">
+                <CircleIndicator
+                  percentage={completedPercentage}
+                  label="Progress %"
+                />
+                <CircleIndicator percentage={successRate} label="Accuracy %" />
+              </div>
+            </>
+          ) : (
+            <>
+              <h1>AWS Cloud Practitioner Quiz</h1>
+              <h2 className="new-quiz-subheader">
+                CLF-C02 Practice Questions ({totalQuestions} available)
+              </h2>
+            </>
           )}
-          <IncorrectList
-            incorrectQuestions={incorrectQuestions}
-            incorrectAnswers={incorrectAnswers}
-          />
-          <div className="footer">
-            {showStatus && question && (
-              <button onClick={() => setShowStatus((prev) => !prev)}>Resume</button>
-            )}
-            {!question && <button onClick={handleReset}>Reset</button>}
-          </div>
+
+          {showStatus && question && (
+            <div className="action-button">
+              <button
+                className={completedPercentage ? "" : "start-new"}
+                onClick={() => setShowStatus((prev) => !prev)}
+              >
+                {completedPercentage ? "Resume Quiz" : "Start"}
+              </button>
+            </div>
+          )}
+          {!!completedPercentage && (
+            <div className="action-button">
+              <button onClick={handleReset}>Reset Quiz</button>
+            </div>
+          )}
+          {!!incorrectAnswers.length && (
+            <div className="action-button">
+              <button onClick={() => setShowReport((prev) => !prev)}>
+                {showReport ? "Hide" : "Show" } Report
+              </button>
+            </div>
+          )}
+          {showReport && !!incorrectAnswers.length && (
+            <>
+              <h2 className="quiz-status-subheader">Incorrect Answers Report ({incorrectAnswers.length})</h2>
+              <IncorrectList
+                incorrectQuestions={incorrectQuestions}
+                incorrectAnswers={incorrectAnswers}
+              />
+            </>
+          )}
         </div>
         {isModalOpen && (
           <ConfirmationModal
@@ -189,14 +212,13 @@ const App: React.FC = () => {
         selectedAnswer={selectedAnswer}
         onSelectAnswer={handleAnswerSelect}
       />
-      <div className="footer">
-        <button
-          disabled={!selectedAnswer.length || (Array.isArray(question.correct) && selectedAnswer.length !== 2)}
-          onClick={handleSubmit}
-        >
-          {hasAnswered ? "Next" : "Submit"}
-        </button>
-      </div>
+      <button
+        className="action-button"
+        disabled={!selectedAnswer.length || (Array.isArray(question.correct) && selectedAnswer.length !== 2)}
+        onClick={handleSubmit}
+      >
+        {hasAnswered ? "Next" : "Submit"}
+      </button>
     </div>
   );
 };

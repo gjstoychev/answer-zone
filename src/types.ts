@@ -1,7 +1,12 @@
+export interface AnswersType {
+  definition: string,
+  details: string,
+}
+
 export interface QuestionType {
   id: number;
   question: string;
-  answers: string[];
+  answers: AnswersType[];
   correct: string[] | string;
 }
   

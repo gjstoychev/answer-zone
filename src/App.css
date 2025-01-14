@@ -16,10 +16,20 @@
   background-color: #333;
   border-radius: 10px;
 
+  .progress-wrapper {
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: center;
+  }
+
   .quiz-status-subheader {
     padding: 30px 0;
     margin: 0 30px;
     border-bottom: 1px solid silver;
+  }
+
+  .new-quiz-subheader {
+    margin-bottom: 40px;
   }
 }
 
@@ -48,20 +58,25 @@
 
     .correct {
       cursor: default;
-      color: darkgreen;
+      color: #333;
       background-color: #a6ef93;
-      border: 1px solid darkgreen;
     }
 
     .wrong {
       cursor: default;
-      color: maroon;
       background-color: lightcoral;
-      border: 1px solid maroon;
     }
 
     .skipped {
       cursor: default;
+    }
+
+    .bold {
+      font-weight: 700;
+    }
+
+    .thin {
+      font-weight: 300;
     }
   }
 }
@@ -81,12 +96,11 @@
 }
 
 .answer-correct {
-  color: darkgreen;
+  color: #333;
   background-color: #a6ef93;
 }
 
 .answer-incorrect {
-  color: maroon;
   background-color: lightcoral;
 }
 
@@ -126,12 +140,18 @@
   }
 }
 
-.footer {
-  margin: 30px auto;
-}
+.action-button {
+  margin: 20px auto;
 
-.read-the-docs {
-  color: #888;
+  button {
+    width: 138px;
+  }
+
+  .start-new {
+    width: auto;
+    color: #333;
+    background-color: #a6ef93;
+  }
 }
 
 .modal-overlay {
@@ -150,16 +170,18 @@
 .modal-content {
   padding: 30px;
   text-align: center;
+  font-size: 18px;
   background: #555;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .modal-actions button:first-child {
-  margin: 0 20px;
-  background: #999;
+  margin: 16px 20px;
+  font-size: 16px;
 }
 
 .modal-actions button:last-child {
-  background: maroon;
+  font-size: 16px;
+  background: lightcoral;
 }

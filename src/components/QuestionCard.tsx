@@ -1,11 +1,12 @@
 import React from "react";
 import Answer from "./Answer";
+import { AnswersType } from "../types";
 
 interface QuestionCardProps {
   question: {
     id: number;
     question: string;
-    answers: string[];
+    answers: AnswersType[];
     correct: string | string[];
   };
   hasAnswered: boolean;
@@ -42,12 +43,13 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
     <div className="question-wrapper">
       <p className="question-line">{questionText}</p>
       <div className="answers-wrapper">
-        {answers.map((answer, index) => (
+        {answers && answers.map((answer: AnswersType, index: number) => (
           <Answer
             key={index.toString() + id}
             answer={answer}
-            className={getAnswerClass(answer)}
-            onClick={() => handleClick(answer)}
+            hasAnswered={hasAnswered}
+            className={getAnswerClass(answer.definition)}
+            onClick={() => handleClick(answer.definition)}
           />
         ))}
       </div>
