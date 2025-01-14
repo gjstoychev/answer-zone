@@ -9,7 +9,7 @@ interface AnswerProps {
 }
 
 const Answer: React.FC<AnswerProps> = ({ answer, className, hasAnswered, onClick }) => {
-  const answerStyles = hasAnswered ? "bold" : "thin";
+  const answerStyles = hasAnswered ? "definition" : "details";
 
   return (
     <p className={className} onClick={onClick}>
